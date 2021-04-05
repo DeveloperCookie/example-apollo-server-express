@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const { graphqlExpress, graphiqlExpress } = require("apollo-server-express");
 const { makeExecutableSchema } = require("graphql-tools");
+var cors = require("cors");
 
 // Some fake data
 const books = [
@@ -17,6 +18,19 @@ const books = [
   },
 ];
 
+const greetings = [
+  {
+    id: 1,
+    language: "english",
+    message: "Hello",
+  },
+  {
+    id: 2,
+    language: "korean",
+    message: "안녕하세요",
+  },
+];
+
 // The GraphQL schema in string form
 const typeDefs = `
   type Book {
@@ -25,9 +39,17 @@ const typeDefs = `
     author: String
   }
   
+  type Greeting {
+    id: Int,
+    language: String,
+    message: String
+  }
+  
   type Query {
     books: [Book],
-    book: Book
+    book(id: Int): Book,
+    greetings: [Greeting],
+    greeting(language: String): Greeting
   }
 
   type Mutation {
@@ -41,6 +63,11 @@ const resolvers = {
     books: () => books,
     book: (_, { id }) => {
       return books.filter((book) => book.id === id)[0];
+    },
+    greetings: () => greetings,
+    greeting: (_, { language }) => {
+      console.log(language);
+      return greetings.filter((greeting) => greeting.language === language)[0];
     },
   },
   Mutation: {
@@ -66,6 +93,8 @@ const schema = makeExecutableSchema({
 
 // Initialize the app
 const app = express();
+
+app.use(cors());
 
 // The GraphQL endpoint
 app.use("/graphql", bodyParser.json(), graphqlExpress({ schema }));
