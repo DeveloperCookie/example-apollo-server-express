@@ -53,7 +53,8 @@ const typeDefs = `
   }
 
   type Mutation {
-    addBook(title: String, author: String): Book
+    addBook(title: String, author: String): Book,
+    addGreeting(language: String, message: String): Greeting
   }
 `;
 
@@ -81,6 +82,17 @@ const resolvers = {
       books.push(newBook);
 
       return newBook;
+    },
+    addGreeting: (_, { language, message }) => {
+      const newGreeting = {
+        id: greetings.length + 1,
+        language,
+        message,
+      };
+
+      greetings.push(newGreeting);
+
+      return newGreeting;
     },
   },
 };
